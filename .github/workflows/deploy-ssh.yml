@@ -1,0 +1,62 @@
+name: Deploy to Hostinger (SSH)
+
+# Alternative deployment method using SSH/SFTP
+# Use this if you have SSH access to your Hostinger account
+
+on:
+  workflow_dispatch: # Manual trigger only
+    inputs:
+      environment:
+        description: 'Deployment environment'
+        required: true
+        default: 'production'
+        type: choice
+        options:
+          - production
+          - staging
+
+jobs:
+  deploy-ssh:
+    name: Deploy via SSH
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+      
+      - name: Setup SSH
+        run: |
+          mkdir -p ~/.ssh
+          echo "${{ secrets.SSH_PRIVATE_KEY }}" > ~/.ssh/deploy_key
+          chmod 600 ~/.ssh/deploy_key
+          ssh-keyscan -H ${{ secrets.SSH_HOST }} >> ~/.ssh/known_hosts
+      
+      - name: Deploy via rsync
+        run: |
+          rsync -avz --delete \
+            -e "ssh -i ~/.ssh/deploy_key -o StrictHostKeyChecking=no" \
+            --exclude='.git' \
+            --exclude='.github' \
+            --exclude='node_modules' \
+            --exclude='*.md' \
+            --exclude='DEPLOYMENT.md' \
+            --exclude='CONTRIBUTING.md' \
+            --exclude='CHANGELOG.md' \
+            --exclude='SECURITY.md' \
+            --exclude='README.md' \
+            --include='index.html' \
+            --include='css/**' \
+            --include='js/**' \
+            --include='robots.txt' \
+            --include='.htaccess' \
+            ./ ${{ secrets.SSH_USERNAME }}@${{ secrets.SSH_HOST }}:${{ secrets.SSH_REMOTE_PATH }}
+      
+      - name: Cleanup
+        if: always()
+        run: |
+          rm -f ~/.ssh/deploy_key
+      
+      - name: Deployment complete
+        run: |
+          echo "✅ SSH deployment completed!"
+          echo "Environment: ${{ github.event.inputs.environment }}"
