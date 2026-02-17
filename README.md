@@ -20,6 +20,7 @@
 
 - [Purpose](#purpose)
 - [Quick Start](#quick-start)
+- [CI/CD Pipeline](#-cicd-pipeline)
 - [Implemented Vulnerabilities](#implemented-vulnerabilities)
 - [File Structure](#file-structure)
 - [Testing with VISTA](#testing-with-vista)
@@ -53,6 +54,45 @@ python3 -m http.server 8000
 ```
 
 **Test Credentials**: `admin` / `admin123` or `user` / `password`
+
+---
+
+## 🔄 CI/CD Pipeline
+
+VulnBank includes automated deployment to Hostinger via GitHub Actions!
+
+### Features
+
+✅ **Automatic Deployment** - Push to `main` → Auto-deploy to Hostinger  
+✅ **Automated Testing** - Validates files before deployment  
+✅ **Multiple Methods** - FTP or SSH deployment  
+✅ **Manual Trigger** - Deploy on-demand via GitHub UI  
+✅ **Deployment Status** - Real-time status in GitHub Actions  
+
+### Quick Setup (5 Minutes)
+
+1. **Get Hostinger FTP credentials** from hPanel
+2. **Add GitHub Secrets**:
+   - `FTP_SERVER` - Your FTP server
+   - `FTP_USERNAME` - Your FTP username
+   - `FTP_PASSWORD` - Your FTP password
+   - `FTP_SERVER_DIR` - Remote directory (e.g., `/public_html/`)
+   - `SITE_URL` - Your website URL
+3. **Push to main** - Deployment happens automatically!
+
+### Documentation
+
+- 📖 [CI/CD Quick Start](CICD_QUICKSTART.md) - 5-minute setup guide
+- 📚 [CI/CD Setup Guide](CICD_SETUP.md) - Complete documentation
+- 🔧 [Troubleshooting](CICD_SETUP.md#-troubleshooting) - Common issues
+
+### Deployment Workflows
+
+- **deploy.yml** - Automatic FTP deployment on push
+- **deploy-ssh.yml** - Manual SSH deployment
+- **test.yml** - Automated testing on push/PR
+
+---
 
 ## Implemented Vulnerabilities
 
