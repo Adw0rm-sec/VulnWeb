@@ -80,16 +80,32 @@ VulnBank includes automated deployment to Hostinger via GitHub Actions!
    - `SITE_URL` - Your website URL
 3. **Push to main** - Deployment happens automatically!
 
+### Deployment Options
+
+**Option 1: GitHub Pages (Recommended - FREE!)**
+- ⚡ 2-minute setup
+- 💰 Free hosting
+- 🔒 Automatic HTTPS
+- 🌍 Global CDN
+- 📖 [GitHub Pages Setup](GITHUB_PAGES_SETUP.md)
+
+**Option 2: Hostinger (Custom Domain)**
+- 🏠 Your own domain
+- 🔧 More control
+- 📖 [Hostinger Setup](CICD_QUICKSTART.md)
+
 ### Documentation
 
-- 📖 [CI/CD Quick Start](CICD_QUICKSTART.md) - 5-minute setup guide
+- 📖 [GitHub Pages Setup](GITHUB_PAGES_SETUP.md) - Deploy in 2 minutes (FREE)
+- 📖 [Hostinger Quick Start](CICD_QUICKSTART.md) - 5-minute setup
 - 📚 [CI/CD Setup Guide](CICD_SETUP.md) - Complete documentation
 - 🔧 [Troubleshooting](CICD_SETUP.md#-troubleshooting) - Common issues
 
 ### Deployment Workflows
 
-- **deploy.yml** - Automatic FTP deployment on push
-- **deploy-ssh.yml** - Manual SSH deployment
+- **deploy-github-pages.yml** - GitHub Pages deployment (automatic)
+- **deploy.yml** - Hostinger FTP deployment (automatic)
+- **deploy-ssh.yml** - Hostinger SSH deployment (manual)
 - **test.yml** - Automated testing on push/PR
 
 ---
