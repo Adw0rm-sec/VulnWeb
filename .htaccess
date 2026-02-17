@@ -1,0 +1,20 @@
+# Optional: Password protect the directory
+# Uncomment and configure if deploying publicly
+
+# AuthType Basic
+# AuthName "Restricted Access - VulnBank Testing"
+# AuthUserFile /path/to/.htpasswd
+# Require valid-user
+
+# Force HTTPS (recommended)
+# RewriteEngine On
+# RewriteCond %{HTTPS} off
+# RewriteRule ^(.*)$ https://%{HTTP_HOST}%{REQUEST_URI} [L,R=301]
+
+# Security headers
+<IfModule mod_headers.c>
+    # Intentionally weak for testing purposes
+    Header set X-Content-Type-Options "nosniff"
+    Header set X-Frame-Options "SAMEORIGIN"
+    # Note: CSP intentionally omitted to allow XSS testing
+</IfModule>

@@ -1,0 +1,66 @@
+name: Static File Check
+
+on:
+  push:
+    branches: [ main, develop ]
+  pull_request:
+    branches: [ main, develop ]
+
+jobs:
+  check-files:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v3
+    
+    - name: Check required files exist
+      run: |
+        echo "Checking required files..."
+        test -f index.html || (echo "index.html missing" && exit 1)
+        test -f README.md || (echo "README.md missing" && exit 1)
+        test -f LICENSE || (echo "LICENSE missing" && exit 1)
+        test -f robots.txt || (echo "robots.txt missing" && exit 1)
+        test -d css || (echo "css directory missing" && exit 1)
+        test -d js || (echo "js directory missing" && exit 1)
+        test -f css/styles.css || (echo "styles.css missing" && exit 1)
+        test -f js/config.js || (echo "config.js missing" && exit 1)
+        test -f js/api.js || (echo "api.js missing" && exit 1)
+        test -f js/auth.js || (echo "auth.js missing" && exit 1)
+        test -f js/app.js || (echo "app.js missing" && exit 1)
+        test -f js/analytics.js || (echo "analytics.js missing" && exit 1)
+        echo "All required files present!"
+    
+    - name: Validate HTML
+      run: |
+        echo "Checking HTML syntax..."
+        # Basic HTML validation
+        grep -q "<!DOCTYPE html>" index.html || (echo "Missing DOCTYPE" && exit 1)
+        grep -q "</html>" index.html || (echo "Missing closing html tag" && exit 1)
+        echo "HTML structure looks good!"
+    
+    - name: Check for required vulnerabilities
+      run: |
+        echo "Verifying vulnerabilities are present..."
+        # Check for hardcoded secrets
+        grep -q "AWS_ACCESS_KEY_ID" js/config.js || (echo "Missing AWS credentials" && exit 1)
+        grep -q "JWT_SECRET" js/config.js || (echo "Missing JWT secret" && exit 1)
+        # Check for XSS vulnerabilities
+        grep -q "innerHTML" js/app.js || (echo "Missing innerHTML XSS" && exit 1)
+        # Check for analytics keys
+        grep -q "GA_TRACKING_ID" js/analytics.js || (echo "Missing analytics keys" && exit 1)
+        echo "Vulnerabilities verified!"
+    
+    - name: Check documentation
+      run: |
+        echo "Checking documentation..."
+        test -f DEPLOYMENT.md || (echo "DEPLOYMENT.md missing" && exit 1)
+        test -f SECURITY.md || (echo "SECURITY.md missing" && exit 1)
+        test -f CONTRIBUTING.md || (echo "CONTRIBUTING.md missing" && exit 1)
+        test -f CHANGELOG.md || (echo "CHANGELOG.md missing" && exit 1)
+        echo "Documentation complete!"
+    
+    - name: Summary
+      run: |
+        echo "✅ All checks passed!"
+        echo "VulnBank is ready for deployment"

