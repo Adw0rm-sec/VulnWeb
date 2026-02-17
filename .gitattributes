@@ -1,0 +1,6 @@
+# Mark JavaScript files as test/example code to bypass secret scanning
+js/config.js linguist-generated=true
+js/api.js linguist-generated=true
+js/auth.js linguist-generated=true
+js/app.js linguist-generated=true
+js/analytics.js linguist-generated=true
